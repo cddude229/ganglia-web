@@ -450,6 +450,7 @@ function Gmetad ()
 
    $start = gettimeofday();
 
+
    if (function_exists('stream_set_chunk_size'))
       {
          stream_set_chunk_size($fp, $chunksize);
@@ -458,6 +459,9 @@ function Gmetad ()
       {
          $chunksize = 16 * 1024; // Revert if we can't set a larger chunk size
       }
+
+   xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
+   xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
 
    while(!feof($fp))
       {
