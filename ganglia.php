@@ -367,7 +367,7 @@ function Gmetad ()
    $timeout = 3.0;
    $errstr = "";
    $errno  = "";
-   $chunksize = 6 * 1024 * 1024; // Most chunks max out at 6mb, so let's avoid over allocating.
+   $chunksize = $conf['gmetad_chunk_size'];
    
    //TODO: all calls to this function (in get_ganglia.php) supply 2 args.  Why do we make that optional?
    switch( func_num_args() )
