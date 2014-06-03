@@ -330,6 +330,7 @@ function Gmetad ()
    $timeout = 3.0;
    $errstr = "";
    $errno  = "";
+   $chunksize = 6 * 1024 * 1024; // Most chunks max out at 6mb, so let's avoid over allocating.
    
    //TODO: all calls to this function (in get_ganglia.php) supply 2 args.  Why do we make that optional?
    switch( func_num_args() )
@@ -401,9 +402,18 @@ function Gmetad ()
 
    $start = gettimeofday();
 
+   if (function_exists('stream_set_chunk_size'))
+      {
+         stream_set_chunk_size($fp, $chunksize);
+      }
+   else
+      {
+         $chunksize = 16 * 1024; // Revert if we can't set a larger chunk size
+      }
+
    while(!feof($fp))
       {
-         $data = fread($fp, 16384);
+         $data = fread($fp, $chunksize);
          if (!xml_parse($parser, $data, feof($fp)))
             {
                $error = sprintf("XML error: %s at %d",

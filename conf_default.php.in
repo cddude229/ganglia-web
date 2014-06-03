@@ -433,4 +433,9 @@ $conf['display_views_using_tree'] = false;
 # when the tree is first created in a browser session. Path entries are 
 # separated using "--"
 #$conf['view_tree_nodes_initially_open'] = array();
+
+# The size to try and load data from gmetad at, if your PHP version
+# supports 'stream_set_chunk_size'  (PHP >= 5.4).  Otherwise, defaults
+# to 8,192.
+$conf['gmetad_chunk_size'] = 6 * 1024 * 1024; // 6MB
 ?>
