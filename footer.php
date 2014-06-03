@@ -23,5 +23,8 @@ foreach ($backend_components as $backend) {
 
 $data->assign("parsetime", sprintf("%.4f", $parsetime) . "s");
 
+$fullparsetime = microtime(true) - $_start;
+$data->assign("fullparsetime", sprintf("%.4f", $fullparsetime) . "s");
+
 $dwoo->output($tpl, $data);
 ?>

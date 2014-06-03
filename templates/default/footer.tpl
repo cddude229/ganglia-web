@@ -99,6 +99,7 @@ Ganglia Web Backend <i>({$webbackend_component})</i> version {$webbackend_versio
 <a href="http://ganglia.sourceforge.net/downloads.php?component={$webbackend_component}&amp;version={$webbackend_version}">Check for Updates.</a><br />
 
 Downloading and parsing ganglia's XML tree took {$parsetime}.<br />
+Rendering this page took {$fullparsetime}.<br />
 Images created with <a href="http://www.rrdtool.org/">RRDtool</a> version {$rrdtool_version}.<br />
 {$dwoo.ad} {$dwoo.version}.<br />
 </font>
