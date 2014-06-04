@@ -310,16 +310,35 @@ function find_avg($clustername, $hostname, $metricname)
     else
         $sum_dir = "${conf['rrds']}/$clustername/__SummaryInfo__";
 
-    $command = $conf['rrdtool'] . " graph /dev/null $rrd_options ".
-        "--start $start --end $end ".
-        "DEF:avg='$sum_dir/$metricname.rrd':'sum':AVERAGE ".
-        "PRINT:avg:AVERAGE:%.2lf ";
-    exec($command, $out);
-    if ( isset($out[1]) ) 
-      $avg = $out[1];
-    else
-      $avg = 0;
-    #echo "$sum_dir: avg($metricname)=$avg<br>\n";
+    $file = $sum_dir . "/" . $metricname . ".rrd";
+
+
+    if (extension_loaded('rrd') && !empty($clustername)) {
+      $values = rrd_fetch($file,
+        array("--start", $start,
+          "--end", $end,
+          "AVERAGE"));
+
+      if($values === false || empty($values)) return 0;
+
+      $values = (array_filter(array_values($values['data']['sum']),
+                'is_finite'));
+
+      $avg = array_sum($values) / count($values);
+    } else {
+      $command = $conf['rrdtool'] . " graph /dev/null $rrd_options ".
+          "--start $start --end $end ".
+          "DEF:avg='$file':'sum':AVERAGE ".
+          "PRINT:avg:AVERAGE:%.2lf ";
+      exec($command, $out);
+      if ( isset($out[1]) ) {
+        $avg = $out[1];
+      }
+      else {
+        $avg = 0;
+      }
+    }
+
     return $avg;
 }
 
@@ -875,31 +894,31 @@ function get_view_graph_elements($view) {
     foreach ($view['items'] as $item_id => $item) {
       // Is it a metric or a graph(report)
       if ( isset($item['metric']) ) {
-	$metric_suffix = "m=" . $item['metric'];
-	$name = $item['metric'];
+      	$metric_suffix = "m=" . $item['metric'];
+      	$name = $item['metric'];
       } else {
-	$metric_suffix = "g=" . $item['graph'];
-	$name = $item['graph'];
+      	$metric_suffix = "g=" . $item['graph'];
+      	$name = $item['graph'];
       }
       
       // Find hosts matching a criteria
       $query = $item['hostname'];
       foreach ( $index_array['hosts'] as $key => $host_name ) {
-	if (preg_match("/$query/", $host_name)) {
-	  $clusters = $index_array['cluster'][$host_name];
-	  foreach ($clusters AS $cluster) {
-	    $graph_args_array[] = "h=" . urlencode($host_name);
-	    $graph_args_array[] = "c=" . urlencode($cluster);
+      	if (preg_match("/$query/", $host_name)) {
+      	  $clusters = $index_array['cluster'][$host_name];
+      	  foreach ($clusters AS $cluster) {
+      	    $graph_args_array[] = "h=" . urlencode($host_name);
+      	    $graph_args_array[] = "c=" . urlencode($cluster);
 
-	    $view_elements[] = 
-	      array("graph_args" => $metric_suffix . "&" . join("&", $graph_args_array), 
-		    "hostname" => $host_name,
-		    "cluster" => $cluster,
-		    "name" => $name);
-	    
-	    unset($graph_args_array);
-	  }
-	}
+      	    $view_elements[] = 
+      	      array("graph_args" => $metric_suffix . "&" . join("&", $graph_args_array), 
+      		    "hostname" => $host_name,
+      		    "cluster" => $cluster,
+      		    "name" => $name);
+      	    
+      	    unset($graph_args_array);
+      	  }
+      	}
       }
     } // end of foreach ( $view['items'] as $item_id => $item )
     break;;
@@ -1341,13 +1360,13 @@ function buildMetricMaps($metrics,
       $graphArgs = $baseGraphArgs . "&amp;v=$metric[VAL]&amp;m=$name";
       # Adding units to graph 2003 by Jason Smith <smithj4@bnl.gov>.
       if ($metric['UNITS']) {
-	$encodeUnits = rawurlencode($metric['UNITS']);
-	$graphArgs .= "&amp;vl=$encodeUnits";
+      	$encodeUnits = rawurlencode($metric['UNITS']);
+      	$graphArgs .= "&amp;vl=$encodeUnits";
       }
       if (isset($metric['TITLE'])) {
-	$title = $metric['TITLE'];
-	$encodeTitle = rawurlencode($title);
-	$graphArgs .= "&amp;ti=$encodeTitle";
+      	$title = $metric['TITLE'];
+      	$encodeTitle = rawurlencode($title);
+      	$graphArgs .= "&amp;ti=$encodeTitle";
       }
       // dump_var($graphArgs, "graphArgs");
 
@@ -1365,12 +1384,12 @@ function buildMetricMaps($metrics,
       }
 
       foreach ($groups as $group) {
-	if (isset($metricGroupMap[$group])) {
-	  $metricGroupMap[$group] = 
-	    array_merge($metricGroupMap[$group], (array)$name);
-	} else {
-	  $metricGroupMap[$group] = array($name);
-	}
+      	if (isset($metricGroupMap[$group])) {
+      	  $metricGroupMap[$group] = 
+      	    array_merge($metricGroupMap[$group], (array)$name);
+      	} else {
+      	  $metricGroupMap[$group] = array($name);
+      	}
       }
     } // if
   } // foreach
