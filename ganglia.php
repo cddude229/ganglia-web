@@ -451,7 +451,7 @@ function Gmetad ()
    $start = gettimeofday();
 
 
-   if (function_exists('stream_set_chunk_size'))
+   if (function_exists('stream_set_chunk_size') && $chunksize > 0)
       {
          stream_set_chunk_size($fp, $chunksize);
       }
