@@ -157,9 +157,6 @@ foreach ( $sorted_sources as $source => $val )
             $sources[$source]["num_dead_nodes"] = $grid[$source]["HOSTS_DOWN"];
             $sources[$source]["range"] = $range;
             $sources[$source]["graph_url"] = $graph_url;
-	    if(isset($base64img)) {
-                $sources[$source]["base64img"] = $base64img;
-	    }
             if ( $source == $self ) {
                $sources[$source]["self_summary_graphs"] = 1;
             } else {
