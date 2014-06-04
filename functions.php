@@ -1397,5 +1397,3 @@ function my_passthru($command) {
   fclose($fp);
   unlink($tf);
 }
-
-?>

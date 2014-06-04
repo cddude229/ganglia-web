@@ -80,5 +80,3 @@ if ($context == "meta" or $context == "control") {
       print "Unknown Context Error: Have you specified a host but not a cluster?.";
 }
 include_once "./footer.php";
-
-?>

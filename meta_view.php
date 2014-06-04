@@ -234,4 +234,3 @@ if ($conf['show_meta_snapshot']=="yes") {
 }
 
 $dwoo->output($tpl, $data);
-?>
