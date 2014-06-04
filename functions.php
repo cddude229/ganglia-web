@@ -168,8 +168,9 @@ function load_color ($value)
    else if ($scaled_load>=0.25) {
       $color = $conf['load_colors']["25-50"];
    }
-   else if ($scaled_load < 0.0)
+   else if ($scaled_load < 0.0) {
       $color = $conf['load_colors']["down"];
+   }
    else {
       $color = $conf['load_colors']["0-25"];
    }

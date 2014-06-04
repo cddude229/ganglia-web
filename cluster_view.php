@@ -23,18 +23,18 @@ if ($refresh) {
 }
 
 function get_picker_metrics($metrics, $reports, $gweb_root, $graph_engine) {
-  $context_metrics = "";
-  if (count($metrics)) {
+  $context_metrics = array();
+  if (!empty($metrics)) {
     foreach ($metrics as $host_metrics) {
       foreach ($host_metrics as $metric_name => $metric_value) {
-	$context_metrics[$metric_name] = rawurldecode($metric_name);
+	      $context_metrics[$metric_name] = rawurldecode($metric_name);
       }
     }
-    foreach ($reports as $report_name => $report_value)
-      $context_metrics[] = $report_name;
+
+    $context_metrics = array_merge($context_metrics, array_keys($reports));
   }
 
-  if (!is_array($context_metrics))
+  if (empty($context_metrics))
     return NULL;
 
   $picker_metrics = array();
@@ -47,10 +47,9 @@ function get_picker_metrics($metrics, $reports, $gweb_root, $graph_engine) {
     else
       $report_suffix = "json";
     
+    $reg = "/(.*)(_report)\.(" . $report_suffix .")/";
     while (false !== ($file = readdir($handle))) {
-      if (preg_match("/(.*)(_report)\.(" . $report_suffix .")/", 
-		     $file, 
-		     $out)) {
+      if (preg_match($reg, $file, $out)) {
         if (!in_array($out[1] . "_report", $context_metrics))
           $context_metrics[] = $out[1] . "_report";
       }
@@ -102,21 +101,19 @@ function get_load_pie($showhosts,
         continue;
       
       $load = get_load($host, $metrics);
+      $loadcolor = load_color($load);
 
-      if (isset($percent_hosts[load_color($load)])) { 
-        $percent_hosts[load_color($load)] += 1;
+      if (isset($percent_hosts[$loadcolor])) { 
+        $percent_hosts[$loadcolor] += 1;
       } else {
-        $percent_hosts[load_color($load)] = 1;
+        $percent_hosts[$loadcolor] = 1;
       }
     }
-         
+
+    $negloadcolor = load_color(-1.0);
+    if(!empty($hosts_down)) $percent_hosts[$negloadcolor] = 0;
     foreach ($hosts_down as $host => $val) {
-      $load = -1.0;
-      if (isset($percent_hosts[load_color($load)])) {
-        $percent_hosts[load_color($load)] += 1;
-      } else {
-        $percent_hosts[load_color($load)] = 1;
-      }
+      $percent_hosts[$negloadcolor] += 1;
     }
 
     // Show pie chart of loads
