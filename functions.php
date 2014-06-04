@@ -255,41 +255,41 @@ function find_limits($clustername,
       $rrd_dir = "{$conf['rrds']}/$clustername/$host";
       $rrd_file = "$rrd_dir/$metricname.rrd";
       if (file_exists($rrd_file)) {
-	if (extension_loaded('rrd')) {
-	  $values = rrd_fetch($rrd_file,
-			      array("--start", $start,
-				    "--end", $end,
-				    "AVERAGE"));
+      	if (extension_loaded('rrd')) {
+      	  $values = rrd_fetch($rrd_file,
+      			      array("--start", $start,
+      				    "--end", $end,
+      				    "AVERAGE"));
 
-	  $values = (array_filter(array_values($values['data']['sum']),
-				  'is_finite'));
-	  $thismax = max($values);
-	  $thismin = min($values);
-	} else {
-	  $command = $conf['rrdtool'] . " graph /dev/null $rrd_options ".
-	    "--start '$start' --end '$end' ".
-	    "DEF:limits='$rrd_dir/$metricname.rrd':'sum':AVERAGE ".
-	    "PRINT:limits:MAX:%.2lf ".
-	    "PRINT:limits:MIN:%.2lf";
-	  $out = array();
-	  exec($command, $out);
-	  if (isset($out[1])) {
-	    $thismax = $out[1];
-	  } else {
-	    $thismax = NULL;
-	  }
-	  if (!is_numeric($thismax)) 
-	    continue;
-	  $thismin = $out[2];
-	  if (!is_numeric($thismin))
-	    continue;
-	}
+      	  $values = (array_filter(array_values($values['data']['sum']),
+      				  'is_finite'));
+      	  $thismax = max($values);
+      	  $thismin = min($values);
+      	} else {
+      	  $command = $conf['rrdtool'] . " graph /dev/null $rrd_options ".
+      	    "--start '$start' --end '$end' ".
+      	    "DEF:limits='$rrd_dir/$metricname.rrd':'sum':AVERAGE ".
+      	    "PRINT:limits:MAX:%.2lf ".
+      	    "PRINT:limits:MIN:%.2lf";
+      	  $out = array();
+      	  exec($command, $out);
+      	  if (isset($out[1])) {
+      	    $thismax = $out[1];
+      	  } else {
+      	    $thismax = NULL;
+      	  }
+      	  if (!is_numeric($thismax)) 
+      	    continue;
+      	  $thismin = $out[2];
+      	  if (!is_numeric($thismin))
+      	    continue;
+      	}
 
-	if ($max < $thismax) 
-	  $max = $thismax;
+      	if ($max < $thismax) 
+      	  $max = $thismax;
 
-	if ($min > $thismin)
-	  $min = $thismin;
+      	if ($min > $thismin)
+      	  $min = $thismin;
 	//echo "$host: $thismin - $thismax<br>\n";
       }
     }
@@ -304,7 +304,6 @@ function find_limits($clustername,
 function find_avg($clustername, $hostname, $metricname)
 {
     global $conf, $start, $end, $rrd_options;
-    $avg = 0;
 
     if ($hostname)
         $sum_dir = "${conf['rrds']}/$clustername/$hostname";
