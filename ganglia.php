@@ -486,5 +486,3 @@ function Gmetad ()
    if ($debug) print "<br/>DEBUG: theoretically completed gmetad parsing\n";
    return TRUE;
 }
-
-?>
